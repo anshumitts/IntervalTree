@@ -24,7 +24,6 @@ int search(node* root,int low,int high)
 {
 	while(root)
 	{
-		cout<<root->max;
 		if(high < root->key)
 			{
 				root = root->left;
@@ -227,6 +226,7 @@ node* delele(node* root, node* sequence)
 {
 	if(sequence)
 	{
+		cout<<sequence->key<<endl;
 		root = newNodeInsert(root, sequence->key,sequence->end);
 		root = delele(root,sequence->left);
 		root = delele(root,sequence->right);
@@ -294,12 +294,9 @@ int main()
 	while(m)
 	{
 		cin>>low>>high;
-		cout<<search(root,low,high);
+		cout<<search(root,low,high)<<endl;
 		m--;
-		// print(root);
 	}
-	print(root);
-	root = deleteNode(root,8);
-	print(root);
+	// deleteNode(root,key); enter value of key
 	return 0;
 }
