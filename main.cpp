@@ -1,7 +1,7 @@
 #include <bits/stdc++.h>
+#define RED 0
+#define BLACK 1
 using namespace std;
-#define RED 0;
-#define BLACK 1;
 struct node
 {
 	int key;
@@ -17,12 +17,17 @@ struct node
        this->col = RED;
        left = right = parent = NULL;
     }
+};
+
+void print(node* root)
+{
+	if(root)
+		{
+			cout<<root->key<<endl;
+			print(root->left);
+			print(root->right);
+		}
 }
-
-// void print(root)
-// {
-
-// }
 
 void rL(node *&root,node *&child)
 {
@@ -62,11 +67,12 @@ void ViolationCorrection(node *&root,node *&newNode)
 {
 	node *gpap = NULL;
 	node* papa = NULL;
-	while((newNode!=root)&&(newNode->col==RED)&&newNode->parent->col==RED)
+	while((newNode!=root)&&(newNode->col==RED)&&((newNode->parent)->col==RED))
 	{
+		// cout<<newNode->key<<endl;
 		papa = newNode->parent;
 		gpap = (newNode->parent)->parent;
-		if(papa ==gpap->left)
+		if(papa==gpap->left)
 		{
 			node *uncle = gpap->right;
 			if(uncle!=NULL && uncle->col==RED)
@@ -80,9 +86,9 @@ void ViolationCorrection(node *&root,node *&newNode)
 			{
 				if (newNode = papa->right)
 				{
-					rL(root,papa)
-					newNode = parent;
-					parent = newNode->papa;
+					rL(root,papa);
+					newNode = papa;
+					papa = newNode->parent;
 				}
 				rR(root,gpap);
 				int temp = gpap->col;
@@ -97,9 +103,9 @@ void ViolationCorrection(node *&root,node *&newNode)
  
             if ((uncle != NULL) && (uncle->col == RED))
             {
-                gpap->color = RED;
-                papa->color = BLACK;
-                uncle->color = BLACK;
+                gpap->col = RED;
+                papa->col = BLACK;
+                uncle->col = BLACK;
                 newNode = gpap;
             }
             else
@@ -111,9 +117,6 @@ void ViolationCorrection(node *&root,node *&newNode)
                     papa = newNode->parent;
                 }
  
-                /* Case : 3
-                   newNode is right child of its parent
-                   Left-rotation required */
                 rL(root, gpap);
                 int temp = gpap->col;
 				gpap->col = papa->col;
@@ -122,27 +125,40 @@ void ViolationCorrection(node *&root,node *&newNode)
             }
         }
     }
- 
     root->col = BLACK;
 }
 
 node* insertNode(node* root,node* temp)
 {
-	node *papa = NULL
+	node *papa = NULL;
 	while(root)
 	{
 		papa = root;
 		if(root->key > temp->key)
 			{
+				if(!(root->left))
+					{
+						root->left = temp;
+						root->left->parent = root;
+						root = root->left;
+						break;
+					}
 				root = root->left;
 			}
-		else if(root->key > temp->key)
+		else if(root->key < temp->key)
 			{
+				if(!(root->right))
+					{
+						root->right = temp;
+						root->right->parent = root;
+						root = root->right;
+						break;
+					}
 				root = root->right;
 			}
 		else{
-			cout<<"Node overlapping cannot insert";
-			return;
+			cout<<"Node overlapping cannot insert"<<endl;
+			return root;
 		}
 	}
 	root=temp;
@@ -153,7 +169,13 @@ node* insertNode(node* root,node* temp)
 node* newNodeInsert(node *root, int data)
 {
 	node *Temp = new node(data);
+	if(root==NULL)
+		{
+			root = Temp;
+		}
+	else{
 	Temp = insertNode(root,Temp);
+	}
 	ViolationCorrection(root, Temp);
 	return root;
 }
@@ -162,12 +184,13 @@ int main()
 {
 	int n;
 	int data;
-	node *root = NULL
+	node *root = NULL;
 	cin>>n;
 	while(n--)
 	{
 		cin>>data;
-		root = newNodeInsert(data);
+		root = newNodeInsert(root,data);
+		print(root);
 	}
 	return 0;
 }
