@@ -20,6 +20,29 @@ struct node
     }
 };
 
+int search(node* root,int low,int high)
+{
+	while(root)
+	{
+		cout<<root->max;
+		if(high < root->key)
+			{
+				root = root->left;
+				continue;
+			}
+		if(high > root->key && low < root->max)
+		{
+			if(low < root->end)
+				return 1;
+			else
+				root = root->right;
+		}
+		else
+			return 0;
+	}
+	return 0;
+}
+
 void print(node* root)
 {
 	if(root)
@@ -39,7 +62,8 @@ int maxVal(node* root)
 		lef = root->left->max;
 	if(root->right)
 		righ = root->right->max;
-	return max(max(lef,righ),itself);
+	int maxi = max(max(lef,righ),itself);
+	return maxi;
 }
 
 void rL(node *&root,node *&child)
@@ -181,6 +205,7 @@ node* insertNode(node* root,node* temp)
 	}
 	root=temp;
 	root->parent = papa;
+	root->max = maxVal(root);
 	return root;
 }
 
@@ -198,17 +223,83 @@ node* newNodeInsert(node *root, int low, int high)
 	return root;
 }
 
+node* delele(node* root, node* sequence)
+{
+	if(sequence)
+	{
+		root = newNodeInsert(root, sequence->key,sequence->end);
+		root = delele(root,sequence->left);
+		root = delele(root,sequence->right);
+	}
+	return root;
+}
+
+node* deleteNode(node* root, int Key)
+{
+	node* temp = root;
+	node* left=NULL;
+	node* right=NULL;
+	while(temp)
+	{
+		if(temp->key == Key)
+		{
+			if(temp == root)
+				{
+					right = root->right;
+					root = left;
+					delele(root,right);
+				}
+			else
+			{
+				left = temp->left;
+				right = temp->right;
+				if (temp == (temp->parent->left))
+				{
+					temp->parent->left = NULL;
+				}
+				else
+				{
+					temp->parent->right = NULL;
+				}
+				delele(root,left);
+				delele(root,right);
+			}
+			break;
+
+		}
+		else if(temp->key > Key)
+		{
+			temp = temp->left;
+		}
+		else
+		{
+			temp = temp->right;	
+		}
+	}
+	return  root;
+}
+
 int main()
 {
-	int n;
+	int n,m;
 	int low,high;
 	node *root = NULL;
-	cin>>n;
-	while(n--)
+	cin>>n>>m;
+	while(n)
 	{
 		cin>>low>>high;
 		root = newNodeInsert(root,low,high);
-		print(root);
+		n--;
 	}
+	while(m)
+	{
+		cin>>low>>high;
+		cout<<search(root,low,high);
+		m--;
+		// print(root);
+	}
+	print(root);
+	root = deleteNode(root,8);
+	print(root);
 	return 0;
 }
