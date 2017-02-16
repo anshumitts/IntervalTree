@@ -6,14 +6,15 @@ struct node
 {
 	int key;
 	int col;
+	int end;
+	int max;
 	node* left;
 	node* right;
 	node* parent;
-	// int end;
-	// int max;
-	node(int data)
+	node(int low, int high)
     {
-       this->key = data;
+       this->key = low;
+       this->end = high;
        this->col = RED;
        left = right = parent = NULL;
     }
@@ -27,6 +28,18 @@ void print(node* root)
 			print(root->left);
 			print(root->right);
 		}
+}
+
+int maxVal(node* root)
+{
+	int lef = -1;
+	int righ = -1;
+	int itself = root->end;
+	if(root->left)
+		lef = root->left->max;
+	if(root->right)
+		righ = root->right->max;
+	return max(max(lef,righ),itself);
 }
 
 void rL(node *&root,node *&child)
@@ -44,6 +57,8 @@ void rL(node *&root,node *&child)
 		(child->parent)->right=papa;
 	papa->left = child;
 	child->parent=papa;
+	child->max = maxVal(child);
+	papa->max = maxVal(papa);
 }
 
 void rR(node *&root,node *&child)
@@ -61,6 +76,8 @@ void rR(node *&root,node *&child)
 		(child->parent)->right=papa;
 	papa->right = child;
 	child->parent=papa;
+	child->max = maxVal(child);
+	papa->max = maxVal(papa);
 }
 
 void ViolationCorrection(node *&root,node *&newNode)
@@ -126,6 +143,7 @@ void ViolationCorrection(node *&root,node *&newNode)
         }
     }
     root->col = BLACK;
+    root->max = maxVal(root);
 }
 
 node* insertNode(node* root,node* temp)
@@ -166,9 +184,9 @@ node* insertNode(node* root,node* temp)
 	return root;
 }
 
-node* newNodeInsert(node *root, int data)
+node* newNodeInsert(node *root, int low, int high)
 {
-	node *Temp = new node(data);
+	node *Temp = new node(low,high);
 	if(root==NULL)
 		{
 			root = Temp;
@@ -183,13 +201,13 @@ node* newNodeInsert(node *root, int data)
 int main()
 {
 	int n;
-	int data;
+	int low,high;
 	node *root = NULL;
 	cin>>n;
 	while(n--)
 	{
-		cin>>data;
-		root = newNodeInsert(root,data);
+		cin>>low>>high;
+		root = newNodeInsert(root,low,high);
 		print(root);
 	}
 	return 0;
